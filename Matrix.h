@@ -151,6 +151,16 @@ void Matrix<T>::set(int row, int col, T value) {
 }
 
 template <typename T>
+int Matrix<T>::getRows() const {
+    return m_rows;
+}
+
+template <typename T>
+int Matrix<T>::getColumns() const {
+    return m_columns;
+}
+
+template <typename T>
 T** Matrix<T>::getPointer() {
     return m_matrix;
 }
