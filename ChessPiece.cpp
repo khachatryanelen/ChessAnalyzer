@@ -100,7 +100,7 @@ bool Bishop::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
         for(int j=0;j<8;j++)
             if(board.get(i,j)==this){ row=i; col=j; }
     if(row==-1) return false;
-    
+
     if(abs(targetRow-row)!=abs(targetCol-col)) return false;
 
     int rstep = (targetRow>row)?1:-1;
