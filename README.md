@@ -5,6 +5,7 @@ This C++ project simulates a chessboard and the movement of chess pieces.
 It allows you to:
 
 Display the current state of the chessboard.
+
 Analyze valid moves for each piece.
 Check for checkmate scenarios after one or two moves.
 Experiment with different chess positions programmatically.
