@@ -14,4 +14,5 @@ The project demonstrates C++ concepts like classes, inheritance, and object-orie
 Build & Run
 
 make
+
 ./chess
