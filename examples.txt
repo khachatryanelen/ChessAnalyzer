@@ -1,0 +1,21 @@
+King black 1 7
+Pawn black 1 6
+Pawn black 2 7
+Queen white 5 3
+Bishop white 3 3
+Bishop white 5 2
+King white 4 4
+
+King black 0 4
+Rook black 1 4
+Pawn black 1 5
+Queen white 6 3
+Bishop white 5 2
+King white 7 4
+
+King black 0 7
+Rook black 1 0
+Pawn black 1 7
+Queen white 5 0
+Knight white 6 1
+King white 7 4

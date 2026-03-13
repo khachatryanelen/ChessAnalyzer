@@ -37,10 +37,7 @@ public:
     T** getPointer();
     T** getPointer() const;
 
-
-    friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix);
 };
-
 
 template <typename T>
 Matrix<T>::Matrix() : m_rows(5), m_columns(5) {
@@ -119,16 +116,11 @@ Matrix<T>::~Matrix() {
 template <typename T>
 void Matrix<T>::allocateMemory() {
     m_matrix = new T*[m_rows];
-    for (int i = 0; i < m_rows; i++)
+    for (int i = 0; i < m_rows; i++){
         m_matrix[i] = new T[m_columns];
-}
-
-template <typename T>
-void Matrix<T>::init() {
-    srand(time(nullptr));
-    for (int i = 0; i < m_rows; i++)
         for (int j = 0; j < m_columns; j++)
-            m_matrix[i][j] = T{};
+            m_matrix[i][j] = nullptr; 
+    }
 }
 
 template <typename T>
@@ -136,7 +128,7 @@ void Matrix<T>::print() const {
     for (int i = 0; i < m_rows; i++) {
         for (int j = 0; j < m_columns; j++)
             std::cout << m_matrix[i][j] << " ";
-        std::cout << "\n";
+        std::cout << std::endl;
     }
 }
 
@@ -180,5 +172,4 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     return os;
 }
 
-
-#endif
+#endif //MATRIX_H

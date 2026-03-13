@@ -34,16 +34,8 @@ int main(int argc,const char* argv[]) {
             board.placePiece(piece, row, col);
     }
 
-    if (board.isKingInDanger("white")){
-        std::cout << "White king is in danger!"<<std::endl;
-    }
+    board.analyze("white");
+    board.printBoard();
 
-    else if (board.isKingInDanger("black")){
-        std::cout << "Black king is in danger!"<<std::endl;
-    }
-    else{
-        std::cout << "There is no check for both kings"<<std::endl;
-
-    }
     return 0;
 }

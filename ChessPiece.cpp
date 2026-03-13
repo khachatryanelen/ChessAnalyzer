@@ -1,230 +1,182 @@
 #include <iostream>
 #include <string>
-#include "ChessPiece.h"
+#include <cmath>
 #include "ChessBoard.h"
+#include "ChessPiece.h"
 
 ChessPiece::ChessPiece(const std::string& color) : color(color) { }
-
 ChessPiece::~ChessPiece() { }
+std::string ChessPiece::getColor() const { return color; }
 
-std::string ChessPiece::getColor() const {
-    return color;
-}
-
-Pawn::Pawn(const std::string& color) : ChessPiece(color) { }
-
-std::string Pawn::name() const {
-    return "Pawn";
-}
-
-Rook::Rook(const std::string& color) : ChessPiece(color) { }
-
-std::string Rook::name() const {
-    return "Rook";
-}
-
-Knight::Knight(const std::string& color) : ChessPiece(color) { }
-
-std::string Knight::name() const {
-    return "Knight";
-}
-
-Bishop::Bishop(const std::string& color) : ChessPiece(color) { }
-
-std::string Bishop::name() const {
-    return "Bishop";
-}
-
-Queen::Queen(const std::string& color) : ChessPiece(color) { }
-
-std::string Queen::name() const {
-    return "Queen";
-}
-
-King::King(const std::string& color) : ChessPiece(color) { }
-
-std::string King::name() const {
-    return "King";
-}
+Pawn::Pawn(const std::string& color) : ChessPiece(color) {}
+std::string Pawn::name() const { return "Pawn"; }
 
 bool Pawn::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
+    if(targetRow < 0 || targetRow >= 8 || targetCol < 0 || targetCol >= 8) return false;
 
-    int direction=(color=="white")? -1 : 1;
     int row=-1,col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
-        }
-    }
-    
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j) == this){ row=i; col=j; }
     if(row==-1) return false;
 
-    if(targetRow == row && targetCol == col)
-        return false;
+    int dir = (color=="white")?-1:1;
 
-    if(targetRow==row+direction &&(targetCol==col+1 || targetCol==col-1))
-        return board.get(targetRow,targetCol)!=nullptr;
+    if(targetRow==row+dir && (targetCol==col+1 || targetCol==col-1)){
+        if(targetRow < 0 || targetRow >= 8 || targetCol < 0 || targetCol >= 8) return false;
+        ChessPiece* dest = board.get(targetRow,targetCol);
+        if(dest && dest->getColor()!=color) return true;
+    }
 
-    if(targetRow==row+direction && targetCol==col && board.get(targetRow,targetCol)==nullptr)
-        return true;
-
-    if((color=="white" && row==6) || (color=="black" && row==1)){
-        if(targetRow==row+2*direction && targetCol==col){
-            if(board.get(row+direction,col)==nullptr && board.get(targetRow,col)==nullptr)
-                return true;
+    if(targetCol==col){
+        if(targetRow < 0 || targetRow >=8) return false;
+        if(board.get(targetRow,targetCol)==nullptr){
+            if(targetRow==row+dir) return true;
+            if((row==6 && color=="white") || (row==1 && color=="black"))
+                if(row+dir >=0 && row+dir <8 && board.get(row+dir,col)==nullptr)
+                    if(targetRow==row+2*dir) return true;
         }
     }
-    
+
     return false;
 }
 
-bool Rook::canMoveTo(int targetRow, int targetCol, const ChessBoard& board) {
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
+Rook::Rook(const std::string& color) : ChessPiece(color) {}
+std::string Rook::name() const { return "Rook"; }
 
-    int row=-1, col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
-        }
-    }
-
+bool Rook::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
+    if(targetRow<0||targetRow>=8||targetCol<0||targetCol>=8) return false;
+    int row=-1,col=-1;
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j)==this){ row=i; col=j; }
     if(row==-1) return false;
-
-    if(targetRow == row && targetCol == col)
-        return false;
-
-    if(row!=targetRow && col!=targetCol) return false; 
+    if(row!=targetRow && col!=targetCol) return false;
 
     if(row==targetRow){
         int step = (targetCol>col)?1:-1;
-        for(int c=col+step;c!=targetCol;c+=step)
-            if(board.get(row,c)) return false;
-    } 
-    else {
+        for(int c=col+step;c!=targetCol;c+=step){
+            if(c<0 || c>=8) return false;
+            if(board.get(row,c)!=nullptr) return false;
+        }
+    } else {
         int step = (targetRow>row)?1:-1;
-        for(int r=row+step;r!=targetRow;r+=step)
-            if(board.get(r,col)) return false;
-    }
-
-    return true;
-}
-
-bool Bishop::canMoveTo(int targetRow, int targetCol, const ChessBoard& board) {
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
-
-    int row=-1,col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
+        for(int r=row+step;r!=targetRow;r+=step){
+            if(r<0 || r>=8) return false;
+            if(board.get(r,col)!=nullptr) return false;
         }
     }
-    
+    ChessPiece* dest = board.get(targetRow,targetCol);
+    return (!dest || dest->getColor()!=color);
+}
+
+Knight::Knight(const std::string& color) : ChessPiece(color) {}
+std::string Knight::name() const { return "Knight"; }
+
+bool Knight::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
+    if(targetRow<0||targetRow>=8||targetCol<0||targetCol>=8) return false;
+    int row=-1,col=-1;
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j)==this){ row=i; col=j; }
     if(row==-1) return false;
+    
+    int dr = abs(row-targetRow);
+    int dc = abs(col-targetCol);
+    if((dr==2 && dc==1) || (dr==1 && dc==2)){
+        ChessPiece* dest = board.get(targetRow,targetCol);
+        return (!dest || dest->getColor()!=color);
+    }
+    return false;
+}
 
-    if(targetRow == row && targetCol == col)
-        return false;
+Bishop::Bishop(const std::string& color) : ChessPiece(color) {}
+std::string Bishop::name() const { return "Bishop"; }
 
+bool Bishop::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
+    if(targetRow<0||targetRow>=8||targetCol<0||targetCol>=8) return false;
+    int row=-1,col=-1;
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j)==this){ row=i; col=j; }
+    if(row==-1) return false;
+    
     if(abs(targetRow-row)!=abs(targetCol-col)) return false;
 
-    int rStep = (targetRow>row)?1:-1;
-    int cStep = (targetCol>col)?1:-1;
-    int r=row+rStep, c=col+cStep;
+    int rstep = (targetRow>row)?1:-1;
+    int cstep = (targetCol>col)?1:-1;
+    int r=row+rstep,c=col+cstep;
     while(r!=targetRow && c!=targetCol){
+        if(r<0 || r>=8 || c<0 || c>=8) return false;
         if(board.get(r,c)) return false;
-        r+=rStep; c+=cStep;
+        r+=rstep; c+=cstep;
     }
-    return true;
+    ChessPiece* dest = board.get(targetRow,targetCol);
+    return (!dest || dest->getColor()!=color);
 }
 
-bool Queen::canMoveTo(int targetRow, int targetCol, const ChessBoard& board) {
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
+Queen::Queen(const std::string& color) : ChessPiece(color) {}
+std::string Queen::name() const { return "Queen"; }
 
+bool Queen::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
+    if(targetRow<0||targetRow>=8||targetCol<0||targetCol>=8) return false;
     int row=-1,col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
-        }
-    }
-    
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j)==this){ row=i; col=j; }
     if(row==-1) return false;
 
-    if(targetRow == row && targetCol == col) 
-        return false; 
-
-    if(row == targetRow || col == targetCol) {
-        if(row == targetRow){
-            int step = (targetCol > col) ? 1 : -1;
-            for(int c = col + step; c != targetCol; c += step)
+    if(row==targetRow || col==targetCol){
+        if(row==targetRow){
+            int step = (targetCol>col)?1:-1;
+            for(int c=col+step;c!=targetCol;c+=step){
+                if(c<0||c>=8) return false;
                 if(board.get(row,c)) return false;
+            }
         } else {
-            int step = (targetRow > row) ? 1 : -1;
-            for(int r = row + step; r != targetRow; r += step)
+            int step = (targetRow>row)?1:-1;
+            for(int r=row+step;r!=targetRow;r+=step){
+                if(r<0||r>=8) return false;
                 if(board.get(r,col)) return false;
+            }
         }
-        return true;
+        ChessPiece* dest = board.get(targetRow,targetCol);
+        return (!dest || dest->getColor()!=color);
     }
 
-    if(abs(targetRow - row) == abs(targetCol - col)) {
-        int rStep = (targetRow > row) ? 1 : -1;
-        int cStep = (targetCol > col) ? 1 : -1;
-        int r = row + rStep, c = col + cStep;
-        while(r != targetRow && c != targetCol){
+    if(abs(targetRow-row)==abs(targetCol-col)){
+        int rstep = (targetRow>row)?1:-1;
+        int cstep = (targetCol>col)?1:-1;
+        int r=row+rstep, c=col+cstep;
+        while(r!=targetRow && c!=targetCol){
+            if(r<0 || r>=8 || c<0 || c>=8) return false;
             if(board.get(r,c)) return false;
-            r += rStep; c += cStep;
+            r+=rstep; c+=cstep;
         }
-        return true;
+        ChessPiece* dest = board.get(targetRow,targetCol);
+        return (!dest || dest->getColor()!=color);
     }
 
     return false;
 }
 
-bool King::canMoveTo(int targetRow,int targetCol,const ChessBoard& board) {
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
+King::King(const std::string& color) : ChessPiece(color) {}
+std::string King::name() const { return "King"; }
 
+bool King::canMoveTo(int targetRow,int targetCol,const ChessBoard& board){
+    if(targetRow<0||targetRow>=8||targetCol<0||targetCol>=8) return false;
     int row=-1,col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
-        }
-    }
-    
+    for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++)
+            if(board.get(i,j)==this){ row=i; col=j; }
     if(row==-1) return false;
-    
-    if(targetRow == row && targetCol == col)
-        return false;
 
-    return std::abs(row-targetRow)<=1 && std::abs(col-targetCol)<=1;
-}
-
-bool Knight::canMoveTo(int targetRow,int targetCol,const ChessBoard& board) {
-    if(targetRow < 0 || targetRow >= board.getRows() || targetCol < 0 || targetCol >= board.getColumns())
-        return false;
-
-    int row=-1,col=-1;
-
-    for(int i=0;i<board.getRows();i++){
-        for(int j=0;j<board.getColumns();j++){
-            if(board.get(i,j)==this) row=i,col=j;
-        }
+    int dr = abs(row-targetRow);
+    int dc = abs(col-targetCol);
+    if(dr<=1 && dc<=1){
+        if(targetRow<0 || targetRow>=8 || targetCol<0 || targetCol>=8) return false;
+        ChessPiece* dest = board.get(targetRow,targetCol);
+        return (!dest || dest->getColor()!=color);
     }
-    
-    if(row==-1) return false;
-    
-    if(targetRow == row && targetCol == col)
-        return false;
-
-    int dirRow = std::abs(row-targetRow);
-    int dirCol = std::abs(col-targetCol);
-    return (dirRow==2 && dirCol==1) || (dirRow==1 && dirCol==2);
+    return false;
 }
